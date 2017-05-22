@@ -6,6 +6,11 @@ os: linux
 dist: trusty
 before_install: 
     - |-
+          VERSION_TO_PUBLISH=$(echo "console.log(require('./version').combined)" | node)
+          echo "$VERSION_TO_PUBLISH"
+          npm version "$VERSION_TO_PUBLISH"
+          npm version
+          exit 1;
           if [[ $TRAVIS_BRANCH == "master" ]]; then
               LAST_PUBLISHED="$(npm view $PACKAGE_NAME@latest version)"
               CURRENT_VERSION="$(npm version | grep -Po "(?<='$PACKAGE_NAME': ')[^']*")"
