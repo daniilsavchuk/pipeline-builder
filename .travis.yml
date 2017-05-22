@@ -22,7 +22,10 @@ script: gulp
 after_script: gulp test:coveralls
 before_deploy:
     - |-
-          echo "require('./version').combined" | node 
+          VERSION_TO_PUBLISH = "$(echo "console.log(require('./version').combined)" | node)"
+          echo $VERSION_TO_PUBLISH
+          npm version $VERSION_TO_PUBLISH
+          npm version
 deploy:
     - provider: npm
       skip_cleanup: true
