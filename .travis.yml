@@ -6,7 +6,7 @@ os: linux
 dist: trusty
 before_install: 
     - |-
-          VERSION_TO_PUBLISH=$(echo "console.log(require('./version').combined)" | node)
+          VERSION_TO_PUBLISH=$(echo "console.log(require('./package.json').version)" | node)$TRAVIS_BUILD_NUMBER
           echo "$VERSION_TO_PUBLISH"
           npm version "$VERSION_TO_PUBLISH"
           npm version
