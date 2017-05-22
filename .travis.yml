@@ -6,14 +6,9 @@ os: linux
 dist: trusty
 before_install: 
     - |-
-          VERSION_TO_PUBLISH=$(echo "console.log(require('./package.json').version)" | node)$TRAVIS_BUILD_NUMBER
-          echo "$VERSION_TO_PUBLISH"
-          npm version "$VERSION_TO_PUBLISH"
-          npm version
-          exit 1;
+          CURRENT_VERSION="$(npm version | grep -Po "(?<='$PACKAGE_NAME': ')[^']*")"
           if [[ $TRAVIS_BRANCH == "master" ]]; then
               LAST_PUBLISHED="$(npm view $PACKAGE_NAME@latest version)"
-              CURRENT_VERSION="$(npm version | grep -Po "(?<='$PACKAGE_NAME': ')[^']*")"
 
               if [[ $LAST_PUBLISHED == $CURRENT_VERSION ]]; then
                   echo "Version change required"
@@ -27,10 +22,12 @@ script: gulp
 after_script: gulp test:coveralls
 before_deploy:
     - |-
-          VERSION_TO_PUBLISH=$(echo "console.log(require('./version').combined)" | node)
-          echo "$VERSION_TO_PUBLISH"
-          npm version $VERSION_TO_PUBLISH
-          npm version
+          if [[ $TRAVIS_BRANCH == "dev" ]]; then
+              VERSION_TO_PUBLISH=$CURRENT_VERSION.$TRAVIS_BUILD_NUMBER
+              echo "$VERSION_TO_PUBLISH"
+              npm --no-git-tag-version version $VERSION_TO_PUBLISH
+              npm version
+          fi
 deploy:
     - provider: npm
       skip_cleanup: true
